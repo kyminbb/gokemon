@@ -7,9 +7,9 @@ from poke_env.player.random_player import RandomPlayer
 from rl.agents.dqn import DQNAgent
 from rl.policy import LinearAnnealedPolicy, EpsGreedyQPolicy
 from rl.memory import SequentialMemory
-from keras.layers import Dense, Flatten
-from keras.models import Sequential
-from keras.optimizers import Adam
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import Adam
 
 
 # We define our RL player
@@ -66,7 +66,7 @@ class MaxDamagePlayer(RandomPlayer):
             return self.choose_random_move(battle)
 
 
-NB_TRAINING_STEPS = 10000
+NB_TRAINING_STEPS = 100
 NB_EVALUATION_EPISODES = 100
 
 tf.random.set_seed(0)
@@ -142,19 +142,6 @@ if __name__ == "__main__":
         opponent=opponent,
         env_algorithm_kwargs={"dqn": dqn, "nb_steps": NB_TRAINING_STEPS},
     )
-    model.save("model_%d" % NB_TRAINING_STEPS)
-
-    # Evaluation
-    print("Results against random player:")
-    env_player.play_against(
-        env_algorithm=dqn_evaluation,
-        opponent=opponent,
-        env_algorithm_kwargs={"dqn": dqn, "nb_episodes": NB_EVALUATION_EPISODES},
-    )
-
-    print("\nResults against max player:")
-    env_player.play_against(
-        env_algorithm=dqn_evaluation,
-        opponent=second_opponent,
-        env_algorithm_kwargs={"dqn": dqn, "nb_episodes": NB_EVALUATION_EPISODES},
-    )
+    print("Saving model...")
+    model.save(f"model_{NB_TRAINING_STEPS}.h5")
+    print("Saved!")
