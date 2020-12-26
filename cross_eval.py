@@ -12,7 +12,10 @@ async def main():
     cross_evaluation = await cross_evaluate(players, n_challenges=20)
 
     table = [["-"] + [p.username for p in players]]
-    print(table)
+    for p_1, results in cross_evaluation.items():
+        table.append([p_1] + [cross_evaluation[p_1][p_2] for p_2 in results])
+
+    print(tabulate(table))
 
 
 if __name__ == "__main__":
