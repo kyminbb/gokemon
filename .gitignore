@@ -1,4 +1,18 @@
-# Created by .ignore support plugin (hsz.mobi)
+### Node.js
+*package-lock.json
+
+# Logs
+*logs/
+*.log
+npm-debug.log*
+
+# Dependency directories
+*node_modules/
+
+# Typescript cache
+*.tsbuildinfo
+
+
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
