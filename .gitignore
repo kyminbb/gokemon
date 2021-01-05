@@ -12,6 +12,9 @@ npm-debug.log*
 # Typescript cache
 *.tsbuildinfo
 
+# Typescript distribution
+*dist/
+
 
 ### Python template
 # Byte-compiled / optimized / DLL files
