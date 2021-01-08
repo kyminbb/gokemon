@@ -2,15 +2,26 @@ const express = require('express');
 const http = require('http');
 const ws = require('ws');
 
+const redis = require('redis');
+
 const calc = require('@smogon/calc');
 const gen = calc.Generations.get(8);
 const mode = { NAME1: 0, NAME2: 1, MOVE: 2 }
 
+
 const app = express();
-
 const server = http.createServer(app);
-
 const wss = new ws.Server({ server });
+
+const redisClient = redis.createClient();
+
+redisClient.on('error', (err) => {
+    console.log(`Error ${err}`);
+});
+
+redisClient.on('connect', () => {
+    console.log('Redis connected successfully!');
+});
 
 wss.on('connection', (socket) => {
     let curMode = mode.NAME1;
@@ -18,13 +29,13 @@ wss.on('connection', (socket) => {
     socket.send('What is the name of your Pokemon?');
     socket.on('message', (data) => {
         switch (curMode) {
-            case mode.NAME1: 
+            case mode.NAME1:
                 console.log(`Pokemon 1: ${data}`);
                 pokemon1 = new calc.Pokemon(gen, data);
                 curMode = mode.NAME2;
                 socket.send('What is the name of the enemy Pokemon?');
                 break;
-            case mode.NAME2: 
+            case mode.NAME2:
                 console.log(`Pokemon 2: ${data}`);
                 pokemon2 = new calc.Pokemon(gen, data);
                 curMode = mode.MOVE;
@@ -50,4 +61,4 @@ wss.on('connection', (socket) => {
 // Start the server
 server.listen(process.env.PORT || 3000, () => {
     console.log(`Server started on port ${server.address().port}`);
-})
+});

@@ -11,6 +11,7 @@
   "dependencies": {
     "@smogon/calc": "^0.6.0",
     "express": "^4.17.1",
+    "redis": "^3.0.2",
     "ws": "^7.4.2"
   },
   "devDependencies": {
