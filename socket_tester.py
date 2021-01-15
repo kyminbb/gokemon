@@ -1,13 +1,21 @@
-import socket
+import json
+
+from websocket import create_connection
 
 
-HOST = '127.0.0.1'
-PORT = 3000
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    print("Connecting...")
-    s.connect((HOST, PORT))
-    s.sendall(b'{"c":5}')
-    data = s.recv(1024)
-
-print(repr(data))
+if __name__ == '__main__':
+    ws = create_connection("ws://protected-stream-83870.herokuapp.com/")
+    msg = dict()
+    msg["from"] = {
+        "name": "Doublade",
+        "moves": ["shadowsneak", "Iron Head"]
+    }
+    msg["to"] = {
+        "name": "Dialga"
+    }
+    msg = json.dumps(msg)
+    print(msg)
+    ws.send(msg)
+    data = ws.recv()
+    print(data)
+    ws.close()
