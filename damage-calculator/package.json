@@ -11,6 +11,11 @@
     "start": "node index.js",
     "server": "nodemon index.js"
   },
+  "keywords": [
+    "pokemon",
+    "damage-calculator",
+    "heroku"
+  ],
   "author": "Kyungmin Kim (kyungmik@andrew.cmu.edu)",
   "license": "ISC",
   "dependencies": {
