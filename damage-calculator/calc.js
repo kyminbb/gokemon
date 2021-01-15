@@ -8,8 +8,6 @@ const getPokemon = ({ name, ...params }) => {
 
 const getMoves = data => data.map(moveName => new smogon.Move(gen, moveName));
 
-const getField = data => new smogon.Field();
-
 const average = arr => {
     if (arr == 0 || arr.length == 0) return 0;
     const sum = arr.reduce((x, y) => x + y, 0);
@@ -19,6 +17,7 @@ const average = arr => {
 const getAverageDamages = (attacker, defender, moves) => {
     const res = {};
     moves.forEach(move => {
+        // Since @smogon/calc returns the list of randomized damages, use the average value
         res[move.name] = average(smogon.calculate(gen, attacker, defender, move).damage);
     });
     return res;

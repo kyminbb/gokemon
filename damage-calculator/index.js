@@ -8,23 +8,25 @@ const server = http.createServer(app);
 const wss = new ws.Server({ server });
 
 wss.on('connection', socket => {
-    socket.on('message', msg => {
+    socket.on('message', req => {
         let res;
         try {
-            const data = JSON.parse(msg);
+            const data = JSON.parse(req);
+            if (data.status === 'done') {
+                // Client finished using the server
+                socket.close();
+                return;
+            }
             const damage = calc.calcDamage(data);
             res = JSON.stringify({ status: 'success', data: damage });
         } catch (err) {
             const errMsg = err instanceof SyntaxError
                 ? 'Failed to parse the request.'
                 : 'Failed to calculate the damage.';
-            res = JSON.stringify({ status: 'error', data: null, message: errMsg });
+            res = JSON.stringify({ status: 'error', message: errMsg });
         }
         socket.send(res);
-        socket.close();
     });
-
-    socket.on('close', code => console.log(`Socket closed! (CODE ${code})`));
 });
 
 
