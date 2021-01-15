@@ -15,7 +15,10 @@ wss.on('connection', socket => {
             const damage = calc.calcDamage(data);
             res = JSON.stringify({ status: 'success', data: damage });
         } catch (err) {
-            res = JSON.stringify({ status: 'error', data: null });
+            const errMsg = err instanceof SyntaxError
+                ? 'Failed to parse the request.'
+                : 'Failed to calculate the damage.';
+            res = JSON.stringify({ status: 'error', data: null, message: errMsg });
         }
         socket.send(res);
         socket.close();
