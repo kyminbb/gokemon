@@ -9,7 +9,7 @@ const getPokemon = ({ name, ...params }) => {
 const getMoves = data => data.map(moveName => new smogon.Move(gen, moveName));
 
 const average = arr => {
-    if (arr == 0 || arr.length == 0) return 0;
+    if (arr === 0 || arr.length === 0) return 0;
     const sum = arr.reduce((x, y) => x + y, 0);
     return sum / arr.length;
 }
