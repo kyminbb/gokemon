@@ -1,12 +1,9 @@
 import json
-import asyncio
 
 from poke_env.player.player import Player
-from poke_env.player.battle_order import BattleOrder
 from websocket import create_connection
 
-# TODO hide this link
-DAMAGE_API = "ws://protected-stream-83870.herokuapp.com/"
+from gokemon._link import DAMAGE_API
 
 
 class GreedyPlayer(Player):
