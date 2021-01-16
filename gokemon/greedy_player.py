@@ -58,6 +58,8 @@ class GreedyPlayer(Player):
 
     def _get_max_damage_switch(self, battle):
         damages = dict()
+        if not battle.available_switches:
+            return None, 0
         for switch in battle.available_switches:
             move, dam = self._get_max_damage_move(
                 switch,
@@ -69,7 +71,6 @@ class GreedyPlayer(Player):
         return switch, damages[switch][1]
 
     def choose_move(self, battle):
-        # print(battle.available_moves)
         poke, damage_s = self._get_max_damage_switch(battle)
 
         if not battle.available_moves:
@@ -83,9 +84,12 @@ class GreedyPlayer(Player):
             battle.opponent_active_pokemon,
             battle
         )
-        # print(f"{poke} can do {damage_s}")
-        # print(f"{battle.active_pokemon} can do {damage_m} with {move}")
-        if damage_s > damage_m:
+        print(f"{poke} can do {damage_s}")
+        print(f"{battle.active_pokemon} can do {damage_m} with {move}")
+        if damage_s - damage_m > 50:
             return self.create_order(poke)
         else:
-            return self.create_order(move)
+            if move in battle.available_moves:
+                return self.create_order(move)
+            else:
+                return self.choose_default_move()
