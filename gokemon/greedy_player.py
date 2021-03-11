@@ -1,11 +1,9 @@
 import json
-import asyncio
 
 from poke_env.player.player import Player
-from poke_env.player.battle_order import BattleOrder
 from websocket import create_connection
 
-DAMAGE_API = "ws://protected-stream-83870.herokuapp.com/"
+from gokemon._link import DAMAGE_API
 
 
 class GreedyPlayer(Player):
@@ -42,25 +40,53 @@ class GreedyPlayer(Player):
         msg["from"] = dict()
         msg["from"]["name"] = str(from_poke).split(" ")[0]
         msg["from"]["moves"] = [move for move in from_poke.moves]
-
+        msg["from"]["boosts"] = from_poke.boosts
         msg["to"] = dict()
         msg["to"]["name"] = str(to_poke).split(" ")[0]
         return json.dumps(msg)
 
-    def _get_max_damage_move(self, battle):
-        msg = self._parse_api_message(battle.active_pokemon,
-                                      battle.opponent_active_pokemon,
-                                      battle)
+    def _get_max_damage_move(self, from_poke, to_poke, battle):
+        msg = self._parse_api_message(from_poke, to_poke, battle)
         self.damage_calculator.send(msg)
         resp = self.damage_calculator.recv()
         result = json.loads(resp)["data"]
-        print(result)
         idx = max(range(len(result)), key=lambda i: list(result.values())[i])
-        print(idx)
-        return self.create_order(battle.available_moves[idx])
+        return list(from_poke.moves.values())[idx], list(result.values())[idx]
+
+    def _get_max_damage_switch(self, battle):
+        damages = dict()
+        if not battle.available_switches:
+            return None, 0
+        for switch in battle.available_switches:
+            move, dam = self._get_max_damage_move(
+                switch,
+                battle.opponent_active_pokemon,
+                battle
+            )
+            damages[switch] = (move, dam)
+        switch = max(damages.keys(), key=lambda s: damages[s][1])
+        return switch, damages[switch][1]
 
     def choose_move(self, battle):
+        poke, damage_s = self._get_max_damage_switch(battle)
+
         if not battle.available_moves:
-            return self.choose_random_move(battle)
+            if battle.active_pokemon.fainted:
+                return self.create_order(poke)
+            else:
+                return self.choose_default_move()
+
+        move, damage_m = self._get_max_damage_move(
+            battle.active_pokemon,
+            battle.opponent_active_pokemon,
+            battle
+        )
+        print(f"{poke} can do {damage_s}")
+        print(f"{battle.active_pokemon} can do {damage_m} with {move}")
+        if damage_s - damage_m > 50:
+            return self.create_order(poke)
         else:
-            return self._get_max_damage_move(battle)
+            if move in battle.available_moves:
+                return self.create_order(move)
+            else:
+                return self.choose_default_move()
